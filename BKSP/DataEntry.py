@@ -2,9 +2,17 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-dataSheet = pd.read_csv("BKSP/Dataset.csv")
-fluxData = dataSheet["solidsFlux"]
-concentrationData = dataSheet["concentration"]
+class DataModel:
+    def __init__(self, dataSheet):
+        self.fluxData = np.array(dataSheet["solidsFlux"])
+        self.concentrationData = np.array(dataSheet["concentration"])
 
-plt.plot(concentrationData, fluxData)
-plt.show()
+    def plot(self):
+        plt.plot(self.concentrationData,self.fluxData)
+        plt.show()
+
+    def interpolate(self, concentration):
+        return np.interp(concentration,self.concentrationData,self.fluxData)
+        
+
+
