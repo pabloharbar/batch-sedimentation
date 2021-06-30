@@ -16,8 +16,6 @@ class InterfaceTrack:
         self.right_concentration = right_concentration
         self.data = data
 
-    
-
     def OleinikCriteria(self):
         self.middlePoint = (self.left_concentration + self.right_concentration) / 2
         self.f_left = self.data.interpolate(self.left_concentration)
@@ -46,7 +44,7 @@ class InterfaceTrack:
 
 dataSheet = pd.read_csv("BKSP/Dataset.csv")
 data = DataEntry.DataModel(dataSheet)
-parameters = Parameters(0.1,0.3,5)  
+parameters = Parameters(0.08,0.3,5)  
 
 upperInterface = InterfaceTrack(0,parameters.initialConcentration,data)
 lowerInterface = InterfaceTrack(parameters.initialConcentration,parameters.maxConcentration,data)
@@ -62,10 +60,13 @@ else:
     #Caso 2 e 3
     hasFoundTan = False
     while(not hasFoundTan):
-        if lowerInterface.right_concentration >= lowerInterface.left_concentration + 0.01:
+        if lowerInterface.right_concentration > lowerInterface.left_concentration + 0.01:
             lowerInterface.IncreaseLeftLimit()
         else: 
             hasFoundTan = True
+            f_0 = data.interpolate(lowerInterface.right_concentration)
+            f_1 = data.interpolate(lowerInterface.right_concentration - 0.01)
+            plt.plot([lowerInterface.right_concentration,lowerInterface.right_concentration - 0.1],[f_0,f_1])
         if lowerInterface.OleinikCriteria():
             hasFoundTan = True
             plt.plot([lowerInterface.left_concentration,lowerInterface.right_concentration],[lowerInterface.f_left, lowerInterface.f_right])
@@ -74,7 +75,13 @@ else:
     lowerInterface.SetLeftLimit(parameters.initialConcentration)
     hasFoundTan = False
     while(not hasFoundTan):
-        lowerInterface.DescreaseRightLimit()
+        if lowerInterface.right_concentration > lowerInterface.left_concentration + 0.01:
+            lowerInterface.DescreaseRightLimit()
+        else:
+            hasFoundTan = True
+            f_0 = data.interpolate(lowerInterface.left_concentration)
+            f_1 = 2*data.interpolate(lowerInterface.left_concentration + 0.01) - 2*f_0
+            plt.plot([lowerInterface.left_concentration,lowerInterface.left_concentration + 0.1],[f_0,f_1])
         if lowerInterface.OleinikCriteria():
             hasFoundTan = True
             plt.plot([lowerInterface.left_concentration,lowerInterface.right_concentration],[lowerInterface.f_left, lowerInterface.f_right])
