@@ -13,6 +13,3 @@ class DataModel:
 
     def interpolate(self, concentration):
         return np.interp(concentration,self.concentrationData,self.fluxData)
-        
-
-
