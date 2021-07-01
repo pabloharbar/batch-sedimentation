@@ -49,9 +49,15 @@ parameters = Parameters(0.08,0.3,5)
 upperInterface = InterfaceTrack(0,parameters.initialConcentration,data)
 lowerInterface = InterfaceTrack(parameters.initialConcentration,parameters.maxConcentration,data)
 
+descSlope = 0
+ascSlope1 = 0 #Implementar função de derivada
+ascSlope2 = 0
+
+
 if upperInterface.OleinikCriteria():
     #Caso 1
-    plt.plot([0,parameters.initialConcentration],[upperInterface.f_left, upperInterface.f_right])
+    plt.plot([upperInterface.left_concentration,upperInterface.right_concentration],[upperInterface.f_left, upperInterface.f_right])
+    descSlope = upperInterface.f_right / upperInterface.right_concentration
 
 if lowerInterface.OleinikCriteria():
     #Caso 1
@@ -67,6 +73,7 @@ else:
             f_0 = data.interpolate(lowerInterface.right_concentration)
             f_1 = data.interpolate(lowerInterface.right_concentration - 0.01)
             plt.plot([lowerInterface.right_concentration,lowerInterface.right_concentration - 0.1],[f_0,f_1])
+            ascSlope2 = (f_1 - f_0) / 0.01
         if lowerInterface.OleinikCriteria():
             hasFoundTan = True
             plt.plot([lowerInterface.left_concentration,lowerInterface.right_concentration],[lowerInterface.f_left, lowerInterface.f_right])
@@ -82,11 +89,19 @@ else:
             f_0 = data.interpolate(lowerInterface.left_concentration)
             f_1 = 2*data.interpolate(lowerInterface.left_concentration + 0.01) - 2*f_0
             plt.plot([lowerInterface.left_concentration,lowerInterface.left_concentration + 0.1],[f_0,f_1])
+            ascSlope1 = (f_1 - f_0) / 0.01
         if lowerInterface.OleinikCriteria():
             hasFoundTan = True
             plt.plot([lowerInterface.left_concentration,lowerInterface.right_concentration],[lowerInterface.f_left, lowerInterface.f_right])
 
 print(lowerInterface.left_concentration)
 plt.plot(data.concentrationData,data.fluxData)
+
+plt.show()
+
+t1 = parameters.height / (ascSlope1 - descSlope)
+z1 = descSlope * t1 + parameters.height
+plt.plot([0,t1],[parameters.height,z1])
+plt.plot([0,t1],[0,z1])
 
 plt.show()
