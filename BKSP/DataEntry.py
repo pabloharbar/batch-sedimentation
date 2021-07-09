@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 
 class DataModel:
     def __init__(self, dataSheet):
-        self.fluxData = np.array(dataSheet["solidsFlux"])
+        self.fluxData = np.array(dataSheet["solidsFlux"]) / 100
         self.concentrationData = np.array(dataSheet["concentration"])
+        self.max = np.max(self.fluxData)
 
     def plot(self):
         plt.plot(self.concentrationData,self.fluxData)
