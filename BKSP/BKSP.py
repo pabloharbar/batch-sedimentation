@@ -45,7 +45,9 @@ class InterfaceTrack:
 
 dataSheet = pd.read_csv("BKSP/Dataset3.csv")
 data = DataEntry.DataModel(dataSheet)
-parameters = Parameters(0.45,0.641996703,9.4)  
+parameters = Parameters(0.5,0.641996703,9.4)  
+
+modes = {MBS_1: True, MBS-2: True,MBS_3 : True,MBS_4 : True,MBS_5 : True,MBS_6 : True,MBS_7 : True}
 
 upperInterface = InterfaceTrack(0,parameters.initialConcentration,data)
 lowerInterface = InterfaceTrack(parameters.initialConcentration,parameters.maxConcentration,data)
