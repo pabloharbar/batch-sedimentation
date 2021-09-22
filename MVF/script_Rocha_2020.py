@@ -13,8 +13,8 @@ solid_density = 2709 # (kg/m3)
 fluid_density = 1145 # (kg/m3)
 
 # Parametros de simulaçao
-total_time = 100 #(s) 31,536,000 -> um ano
-timestep = 0.1
+total_time = 1000000000 #(s) 31,536,000 -> um ano
+timestep = 0.001
 
 # Parametros estimados
 #Permeabilidade
@@ -75,20 +75,33 @@ Concentration[N_len - 1] = max_conc
 Velocity = np.zeros(N_len, dtype=float)
 Position = 0.5 / z_resolution + np.arange(N_len, dtype=float) * 1 / z_resolution
 
+currentTime = 0
+Time = [currentTime]
+Data = []
+Data.append(Concentration)
+count = 0
 
+while (currentTime <= total_time):
 
-for i in range(0,N_len):
-    grad = conc_grad(Concentration, i, N_len, L)
-    Velocity[i] = vel(Concentration[i],particle_diam,k0,delta,max_conc,M,esph,n,mixture_density,solid_density,fluid_density,initial_conc,p_ref,beta,ref_conc,grad)
+    for i in range(0,N_len):
+        grad = conc_grad(Concentration, i, N_len, L)
+        Velocity[i] = vel(Concentration[i],particle_diam,k0,delta,max_conc,M,esph,n,mixture_density,solid_density,fluid_density,initial_conc,p_ref,beta,ref_conc,grad)
+    
+    for i in range(0,N_len):
+        if i == 0:
+            update = - timestep * (Concentration[i+1] * Velocity[i+1]) / (L / N_len)
+        elif i == (N_len - 1):
+            update = - timestep * (Concentration[i] * Velocity[i]) / (L / N_len)
+        else:
+            update = - timestep * (Concentration[i+1] * Velocity[i+1] - Concentration[i] * Velocity[i]) / (L / N_len)
+        Concentration[i] = Concentration[i] + update
+        
+        count += 1
+        if count>10:
+            Data.append(Concentration)
+            count = 0
+        
+        currentTime += timestep
+        Time.append(currentTime)
 
-for i in range(0,N_len):
-    if i == 0:
-        update = - timestep * (Concentration[i+1] * Velocity[i+1]) / (L / N_len)
-    elif i == (N_len - 1):
-        update = - timestep * (Concentration[i] * Velocity[i]) / (L / N_len)
-    else:
-        update = - timestep * (Concentration[i+1] * Velocity[i+1] - Concentration[i] * Velocity[i]) / (L / N_len)
-    Concentration[i] = Concentration[i] + update
-
-
-
+print(Concentration.min())
